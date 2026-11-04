@@ -16,7 +16,7 @@ const initialsOf = (nom) =>
 export default function EmployerSpace() {
   const {
     employerProfile, saveEmployerProfile, employerOffers,
-    openOfferModal, showToast, showHome, logout,
+    openOfferModal, toggleOfferStatus, showToast, showHome, logout,
   } = useApp()
   const [tab, setTab] = useState('profil')
   const [form, setForm] = useState(EMPTY_FORM)
@@ -122,14 +122,23 @@ export default function EmployerSpace() {
                   ) : (
                     employerOffers.map((o) => (
                       <div className="application-item" key={o.id} style={{ cursor: 'default' }}>
-                        <div className="app-logo" style={{ background: '#2563eb' }}>{o.titre.charAt(0)}</div>
+                        <div className="app-logo" style={{ background: o.statut === 'active' ? '#2563eb' : '#94a3b8' }}>{o.titre.charAt(0)}</div>
                         <div className="app-info">
                           <div className="app-title">{o.titre}</div>
-                          <div className="app-company">{o.localisation} · {o.contrat} · {o.date}</div>
+                          <div className="app-company">{o.localisation} · {o.contrat} · {o.date}{o.statut === 'inactive' ? ' · Désactivée' : ''}</div>
                           <div className="app-date" style={{ color: 'var(--primary)', fontWeight: 600 }}>
                             <Icon name="file" size="xs" />
                             {o.candidatures} candidature(s)
                           </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button className="btn btn-ghost btn-sm" onClick={() => openOfferModal(o.id)}>Modifier</button>
+                          <button
+                            className={`btn ${o.statut === 'active' ? 'btn-danger' : 'btn-success'} btn-sm`}
+                            onClick={() => toggleOfferStatus(o.id)}
+                          >
+                            {o.statut === 'active' ? 'Désactiver' : 'Réactiver'}
+                          </button>
                         </div>
                       </div>
                     ))

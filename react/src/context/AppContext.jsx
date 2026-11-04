@@ -49,7 +49,9 @@ export function AppProvider({ children }) {
   const bannerTimer = useRef(null)
   useEffect(() => () => { clearTimeout(toastTimer.current); clearTimeout(bannerTimer.current) }, [])
 
-  const currentOffer = offers.find((o) => o.id === currentOfferId) || null
+  // Le public (accueil, détail, similaires) ne voit que les offres actives
+  const visibleOffers = offers.filter((o) => o.actif !== false)
+  const currentOffer = visibleOffers.find((o) => o.id === currentOfferId) || null
   const scrollTop = () => window.scrollTo(0, 0)
 
   // --- Navigation ---
@@ -165,6 +167,7 @@ export function AppProvider({ children }) {
     if (!offer) return
     const next = offer.statut === 'active' ? 'inactive' : 'active'
     setEmployerOffers((prev) => prev.map((o) => (o.id === offerId ? { ...o, statut: next } : o)))
+    setOffers((prev) => prev.map((o) => (o.id === offerId ? { ...o, actif: next === 'active' } : o)))
     showToast(next === 'active' ? 'Offre réactivée' : 'Offre désactivée')
   }
 
@@ -173,7 +176,7 @@ export function AppProvider({ children }) {
 
   const submitOffer = ({ editId, titre, localisation, contrat, description, missions, profil }) => {
     if (editId) {
-      setEmployerOffers((prev) => prev.map((o) => (o.id === editId ? { ...o, titre, localisation, contrat } : o)))
+      setEmployerOffers((prev) => prev.map((o) => (o.id === editId ? { ...o, titre, localisation, contrat, description, missions, profil } : o)))
       setOffers((prev) =>
         prev.map((o) => (o.id === editId ? { ...o, titre, localisation, contrat, description, descriptionLongue: description, missions, profil } : o))
       )
@@ -190,7 +193,7 @@ export function AppProvider({ children }) {
           avantages: ['Rémunération attractive', 'Ambiance collaborative'],
         },
       ])
-      setEmployerOffers((prev) => [...prev, { id: newId, titre, localisation, contrat, date: "À l'instant", statut: 'active', candidatures: 0 }])
+      setEmployerOffers((prev) => [...prev, { id: newId, titre, localisation, contrat, description, missions, profil, date: "À l'instant", statut: 'active', candidatures: 0 }])
       showToast('Offre publiée avec succès !')
     }
     closeOfferModal()
@@ -205,7 +208,7 @@ export function AppProvider({ children }) {
 
   const value = {
     view, role, loggedIn, registerRole, setRegisterRole,
-    offers, filters, setFilters, currentOffer,
+    offers: visibleOffers, filters, setFilters, currentOffer,
     userApplications, userNotifications, applyBanner,
     employerOffers, employerApplications,
     employerProfile, saveEmployerProfile,

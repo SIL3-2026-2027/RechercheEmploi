@@ -5,14 +5,27 @@ import Icon from './Icon'
 const EMPTY = { titre: '', description: '', localisation: '', contrat: 'CDI', missions: '', profil: '' }
 
 export default function OfferModal() {
-  const { offerModal, closeOfferModal, submitOffer } = useApp()
+  const { offerModal, closeOfferModal, employerOffers, submitOffer } = useApp()
   const [form, setForm] = useState(EMPTY)
-  const { open } = offerModal
+  const { open, editId } = offerModal
 
-  // Formulaire vide à chaque ouverture
+  // À chaque ouverture : formulaire vide (création) ou prérempli (modification)
   useEffect(() => {
-    if (open) setForm(EMPTY)
-  }, [open])
+    if (!open) return
+    if (editId) {
+      const offre = employerOffers.find((o) => o.id === editId)
+      setForm({
+        titre: offre?.titre || '',
+        description: offre?.description || '',
+        localisation: offre?.localisation || '',
+        contrat: offre?.contrat || 'CDI',
+        missions: (offre?.missions || []).join('\n'),
+        profil: (offre?.profil || []).join('\n'),
+      })
+    } else {
+      setForm(EMPTY)
+    }
+  }, [open, editId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
   const lines = (text) => text.split('\n').map((l) => l.trim()).filter(Boolean)
@@ -20,7 +33,7 @@ export default function OfferModal() {
   const onSubmit = (e) => {
     e.preventDefault()
     submitOffer({
-      editId: null,
+      editId,
       titre: form.titre.trim(),
       localisation: form.localisation.trim(),
       contrat: form.contrat,
@@ -34,7 +47,7 @@ export default function OfferModal() {
     <div className={`modal-overlay${open ? ' active' : ''}`} id="offerModal">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Créer une nouvelle offre</h2>
+          <h2>{editId ? "Modifier l'offre" : 'Créer une nouvelle offre'}</h2>
           <button className="modal-close" onClick={closeOfferModal}><Icon name="x" /></button>
         </div>
         <form onSubmit={onSubmit}>
@@ -71,7 +84,7 @@ export default function OfferModal() {
           </div>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 20 }}>
             <button type="button" className="btn btn-ghost" onClick={closeOfferModal}>Annuler</button>
-            <button type="submit" className="btn btn-primary">Publier l'offre</button>
+            <button type="submit" className="btn btn-primary">{editId ? 'Enregistrer' : "Publier l'offre"}</button>
           </div>
         </form>
       </div>
