@@ -1,19 +1,18 @@
 import { useApp } from './context/AppContext'
 import EmployerSpace from './pages/EmployerSpace'
+import OfferDetail from './pages/OfferDetail'
 import OfferModal from './components/OfferModal'
 import Toast from './components/Toast'
-import Home from './pages/Home' // TEST LOCAL
-import Login from './pages/Login' // TEST LOCAL
-import Register from './pages/Register' // TEST LOCAL
 
+// Chaque membre de l'équipe ajoute ici les pages de ses issues :
+//   1. un import en haut du fichier
+//   2. une ligne d'affichage dans le return (selon `view` de useApp())
 export default function App() {
   const { view, role } = useApp()
 
   return (
     <>
-      {view === 'home' && <Home />} {/* TEST LOCAL */}
-      {view === 'login' && <Login />} {/* TEST LOCAL */}
-      {view === 'register' && <Register />} {/* TEST LOCAL */}
+      {view === 'detail' && <OfferDetail />}
       {view === 'space' && role === 'employeur' && <EmployerSpace />}
       <OfferModal />
       <Toast />

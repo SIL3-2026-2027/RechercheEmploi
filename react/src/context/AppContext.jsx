@@ -24,7 +24,10 @@ export function AppProvider({ children }) {
   const [userApplications, setUserApplications] = useState([])
   const [userNotifications, setUserNotifications] = useState([])
   const [applyBanner, setApplyBanner] = useState(null)
-  const [employerOffers, setEmployerOffers] = useState([])
+  const [employerOffers, setEmployerOffers] = useState([
+    { id: 1, titre: 'Développeur Full-Stack React / Laravel', localisation: 'Cotonou, Bénin', contrat: 'CDI', date: 'Il y a 2 jours', statut: 'active', candidatures: 3 },
+    { id: 2, titre: 'Designer UI / UX', localisation: 'Paris, France', contrat: 'CDD', date: 'Il y a 4 jours', statut: 'active', candidatures: 1 },
+  ])
   const [employerApplications, setEmployerApplications] = useState([
     { id: 1, offerId: 1, candidat: 'Kèmi Dossou', email: 'kemi.dossou@exemple.com', date: 'Il y a 1 jour', statut: 'recue', cv: 'CV_Kemi_Dossou.pdf' },
     { id: 2, offerId: 1, candidat: 'Francis A.', email: 'francis.a@exemple.com', date: 'Il y a 2 jours', statut: 'examen', cv: 'CV_Francis_A.pdf' },
@@ -49,9 +52,7 @@ export function AppProvider({ children }) {
   const bannerTimer = useRef(null)
   useEffect(() => () => { clearTimeout(toastTimer.current); clearTimeout(bannerTimer.current) }, [])
 
-  // Le public (accueil, détail, similaires) ne voit que les offres actives
-  const visibleOffers = offers.filter((o) => o.actif !== false)
-  const currentOffer = visibleOffers.find((o) => o.id === currentOfferId) || null
+  const currentOffer = offers.find((o) => o.id === currentOfferId) || null
   const scrollTop = () => window.scrollTo(0, 0)
 
   // --- Navigation ---
@@ -167,7 +168,6 @@ export function AppProvider({ children }) {
     if (!offer) return
     const next = offer.statut === 'active' ? 'inactive' : 'active'
     setEmployerOffers((prev) => prev.map((o) => (o.id === offerId ? { ...o, statut: next } : o)))
-    setOffers((prev) => prev.map((o) => (o.id === offerId ? { ...o, actif: next === 'active' } : o)))
     showToast(next === 'active' ? 'Offre réactivée' : 'Offre désactivée')
   }
 
@@ -176,24 +176,22 @@ export function AppProvider({ children }) {
 
   const submitOffer = ({ editId, titre, localisation, contrat, description, missions, profil }) => {
     if (editId) {
-      setEmployerOffers((prev) => prev.map((o) => (o.id === editId ? { ...o, titre, localisation, contrat, description, missions, profil } : o)))
+      setEmployerOffers((prev) => prev.map((o) => (o.id === editId ? { ...o, titre, localisation, contrat } : o)))
       setOffers((prev) =>
         prev.map((o) => (o.id === editId ? { ...o, titre, localisation, contrat, description, descriptionLongue: description, missions, profil } : o))
       )
       showToast('Offre modifiée avec succès')
     } else {
       const newId = Math.max(0, ...offers.map((o) => o.id)) + 1
-      const entreprise = employerProfile ? employerProfile.nom : 'Mon entreprise'
-      const initiales = entreprise.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
       setOffers((prev) => [
         ...prev,
         {
-          id: newId, titre, entreprise, initiales, couleur: '#2563eb', localisation, contrat,
+          id: newId, titre, entreprise: 'TechInnov SARL', initiales: 'TI', couleur: '#2563eb', localisation, contrat,
           date: "À l'instant", description, descriptionLongue: description, missions, profil,
           avantages: ['Rémunération attractive', 'Ambiance collaborative'],
         },
       ])
-      setEmployerOffers((prev) => [...prev, { id: newId, titre, localisation, contrat, description, missions, profil, date: "À l'instant", statut: 'active', candidatures: 0 }])
+      setEmployerOffers((prev) => [...prev, { id: newId, titre, localisation, contrat, date: "À l'instant", statut: 'active', candidatures: 0 }])
       showToast('Offre publiée avec succès !')
     }
     closeOfferModal()
@@ -208,7 +206,7 @@ export function AppProvider({ children }) {
 
   const value = {
     view, role, loggedIn, registerRole, setRegisterRole,
-    offers: visibleOffers, filters, setFilters, currentOffer,
+    offers, filters, setFilters, currentOffer,
     userApplications, userNotifications, applyBanner,
     employerOffers, employerApplications,
     employerProfile, saveEmployerProfile,
