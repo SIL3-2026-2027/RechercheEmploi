@@ -14,7 +14,10 @@ const initialsOf = (nom) =>
     .join('')
 
 export default function EmployerSpace() {
-  const { employerProfile, saveEmployerProfile, showHome, logout } = useApp()
+  const {
+    employerProfile, saveEmployerProfile, employerOffers,
+    openOfferModal, showToast, showHome, logout,
+  } = useApp()
   const [tab, setTab] = useState('profil')
   const [form, setForm] = useState(EMPTY_FORM)
 
@@ -36,6 +39,15 @@ export default function EmployerSpace() {
       siteWeb: form.siteWeb.trim(),
       description: form.description.trim(),
     })
+  }
+
+  const onNewOffer = () => {
+    if (!hasProfile) {
+      showToast("Créez d'abord le profil de votre entreprise pour publier une offre.")
+      setTab('profil')
+      return
+    }
+    openOfferModal()
   }
 
   const navLink = (id, icon, label) => (
@@ -75,6 +87,7 @@ export default function EmployerSpace() {
         <aside className="space-sidebar">
           <nav className="sidebar-nav">
             <div className="sidebar-label">Espace employeur</div>
+            {navLink('offres', 'briefcase', 'Mes offres')}
             {navLink('profil', 'user', 'Profil employeur')}
             <div className="sidebar-divider"></div>
             <a onClick={logout}>
@@ -85,6 +98,47 @@ export default function EmployerSpace() {
         </aside>
 
         <main className="space-main">
+          {tab === 'offres' && (
+            <div className="space-tab active">
+              <div className="space-welcome">
+                <h1>Mes offres d'emploi</h1>
+                <p>Publiez vos offres et retrouvez-les ici.</p>
+              </div>
+              <div className="space-section">
+                <div className="space-section-header">
+                  <h2>Liste de mes offres</h2>
+                  <button className="btn btn-primary btn-sm" onClick={onNewOffer}>
+                    <Icon name="plus" size="sm" />
+                    Nouvelle offre
+                  </button>
+                </div>
+                <div>
+                  {employerOffers.length === 0 ? (
+                    <div className="empty-space">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" dangerouslySetInnerHTML={{ __html: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' }} />
+                      <h3>Aucune offre publiée</h3>
+                      <p>Créez votre première offre pour recevoir des candidatures.</p>
+                    </div>
+                  ) : (
+                    employerOffers.map((o) => (
+                      <div className="application-item" key={o.id} style={{ cursor: 'default' }}>
+                        <div className="app-logo" style={{ background: '#2563eb' }}>{o.titre.charAt(0)}</div>
+                        <div className="app-info">
+                          <div className="app-title">{o.titre}</div>
+                          <div className="app-company">{o.localisation} · {o.contrat} · {o.date}</div>
+                          <div className="app-date" style={{ color: 'var(--primary)', fontWeight: 600 }}>
+                            <Icon name="file" size="xs" />
+                            {o.candidatures} candidature(s)
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {tab === 'profil' && (
             <div className="space-tab active">
               <div className="space-welcome">

@@ -24,15 +24,15 @@ export function AppProvider({ children }) {
   const [userApplications, setUserApplications] = useState([])
   const [userNotifications, setUserNotifications] = useState([])
   const [applyBanner, setApplyBanner] = useState(null)
-  const [employerOffers, setEmployerOffers] = useState([
-    { id: 1, titre: 'Développeur Full-Stack React / Laravel', localisation: 'Cotonou, Bénin', contrat: 'CDI', date: 'Il y a 2 jours', statut: 'active', candidatures: 3 },
-    { id: 2, titre: 'Designer UI / UX', localisation: 'Paris, France', contrat: 'CDD', date: 'Il y a 4 jours', statut: 'active', candidatures: 1 },
-  ])
+  const [employerOffers, setEmployerOffers] = useState([])
   const [employerApplications, setEmployerApplications] = useState([
     { id: 1, offerId: 1, candidat: 'Kèmi Dossou', email: 'kemi.dossou@exemple.com', date: 'Il y a 1 jour', statut: 'recue', cv: 'CV_Kemi_Dossou.pdf' },
     { id: 2, offerId: 1, candidat: 'Francis A.', email: 'francis.a@exemple.com', date: 'Il y a 2 jours', statut: 'examen', cv: 'CV_Francis_A.pdf' },
     { id: 3, offerId: 2, candidat: 'Esméralda K.', email: 'esmeralda.k@exemple.com', date: 'Il y a 3 jours', statut: 'acceptee', cv: 'CV_Esmeralda_K.pdf' },
   ])
+
+  // Profil employeur (null tant que le profil n'est pas créé)
+  const [employerProfile, setEmployerProfile] = useState(null)
 
   // Modale d'offre
   const [offerModal, setOfferModal] = useState({ open: false, editId: null })
@@ -180,10 +180,12 @@ export function AppProvider({ children }) {
       showToast('Offre modifiée avec succès')
     } else {
       const newId = Math.max(0, ...offers.map((o) => o.id)) + 1
+      const entreprise = employerProfile ? employerProfile.nom : 'Mon entreprise'
+      const initiales = entreprise.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('')
       setOffers((prev) => [
         ...prev,
         {
-          id: newId, titre, entreprise: 'TechInnov SARL', initiales: 'TI', couleur: '#2563eb', localisation, contrat,
+          id: newId, titre, entreprise, initiales, couleur: '#2563eb', localisation, contrat,
           date: "À l'instant", description, descriptionLongue: description, missions, profil,
           avantages: ['Rémunération attractive', 'Ambiance collaborative'],
         },
@@ -194,11 +196,19 @@ export function AppProvider({ children }) {
     closeOfferModal()
   }
 
+  // --- Profil employeur ---
+  const saveEmployerProfile = (profile) => {
+    const isCreation = !employerProfile
+    setEmployerProfile(profile)
+    showToast(isCreation ? 'Profil employeur créé avec succès' : 'Profil employeur modifié avec succès')
+  }
+
   const value = {
     view, role, loggedIn, registerRole, setRegisterRole,
     offers, filters, setFilters, currentOffer,
     userApplications, userNotifications, applyBanner,
     employerOffers, employerApplications,
+    employerProfile, saveEmployerProfile,
     offerModal, toast,
     showToast, showHome, showAuth, cancelAuth, openOfferDetail, closeOfferDetail,
     handleApply, login, logout,
