@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext'
 import { STATUS_LABELS } from '../constants'
 import Icon, { RawSvg } from '../components/Icon'
 import LogoMark from '../components/LogoMark'
+import ActivityFeed from '../components/ActivityFeed'
 
 function ApplicationList({ items, openOfferDetail }) {
   if (items.length === 0) {
@@ -63,6 +64,7 @@ export default function CandidateSpace() {
           <nav className="sidebar-nav">
             <div className="sidebar-label">Espace candidat</div>
             {navLink('dashboard', 'grid', 'Tableau de bord')}
+            {navLink('actualite', 'info', "Fil d'actualité")}
             {navLink('candidatures', 'fileLines', 'Mes candidatures')}
             {navLink('profil', 'user', 'Mon profil')}
             {navLink('cv', 'file', 'Mon CV')}
@@ -94,6 +96,8 @@ export default function CandidateSpace() {
               </div>
             </div>
           )}
+
+          {tab === 'actualite' && <ActivityFeed onNavigate={setTab} />}
 
           {tab === 'candidatures' && (
             <div className="space-tab active">

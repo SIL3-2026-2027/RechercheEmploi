@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import Icon from '../components/Icon'
 import LogoMark from '../components/LogoMark'
+import ActivityFeed from '../components/ActivityFeed'
 
 export default function AdminSpace() {
   const { showHome, logout, showToast } = useApp()
@@ -33,6 +34,7 @@ export default function AdminSpace() {
           <nav className="sidebar-nav">
             <div className="sidebar-label">Administration</div>
             {navLink('dashboard', 'grid', 'Tableau de bord')}
+            {navLink('actualite', 'info', "Fil d'actualité")}
             {navLink('comptes', 'user', 'Gestion des comptes')}
             {navLink('moderation', 'shield', 'Modération des offres')}
             <div className="sidebar-divider"></div>
@@ -62,6 +64,8 @@ export default function AdminSpace() {
               </div>
             </div>
           )}
+
+          {tab === 'actualite' && <ActivityFeed onNavigate={setTab} />}
 
           {tab === 'comptes' && (
             <div className="space-tab active">

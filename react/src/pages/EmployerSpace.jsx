@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useApp } from '../context/AppContext'
 import Icon from '../components/Icon'
 import LogoMark from '../components/LogoMark'
+import ActivityFeed from '../components/ActivityFeed'
 
 const EMPTY_FORM = { nom: '', secteur: '', localisation: '', siteWeb: '', description: '' }
 
@@ -87,6 +88,7 @@ export default function EmployerSpace() {
         <aside className="space-sidebar">
           <nav className="sidebar-nav">
             <div className="sidebar-label">Espace employeur</div>
+            {navLink('actualite', 'info', "Fil d'actualité")}
             {navLink('offres', 'briefcase', 'Mes offres')}
             {navLink('profil', 'user', 'Profil employeur')}
             <div className="sidebar-divider"></div>
@@ -98,6 +100,8 @@ export default function EmployerSpace() {
         </aside>
 
         <main className="space-main">
+          {tab === 'actualite' && <ActivityFeed onNavigate={setTab} />}
+
           {tab === 'offres' && (
             <div className="space-tab active">
               <div className="space-welcome">
